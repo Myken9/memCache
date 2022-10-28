@@ -3,19 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
 	"memcach/pkg/cache"
+	"os"
 	"time"
 )
 
-const (
-	address = "localhost:50051"
-)
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
 
 func main() {
 
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(os.Getenv("PORT"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
