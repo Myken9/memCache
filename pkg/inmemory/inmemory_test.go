@@ -6,7 +6,7 @@ import (
 )
 
 func TestStorage_Set(t *testing.T) {
-	st := NewStorage(make(map[string]string))
+	st := Storage{}
 
 	t.Run("Currency set", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -31,7 +31,7 @@ func TestStorage_Set(t *testing.T) {
 }
 
 func TestStorage_Delete(t *testing.T) {
-	st := NewStorage(make(map[string]string))
+	st := Storage{}
 
 	t.Run("Currency delete", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -56,7 +56,7 @@ func TestStorage_Delete(t *testing.T) {
 }
 
 func TestStorage_Get(t *testing.T) {
-	st := NewStorage(make(map[string]string))
+	st := Storage{}
 
 	t.Run("Currency get", func(t *testing.T) {
 		var wg sync.WaitGroup

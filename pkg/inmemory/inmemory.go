@@ -1,22 +1,25 @@
 package inmemory
 
+import "sync"
+
 type Storage struct {
-	st map[string]string
+	st sync.Map
 }
 
-func NewStorage(st map[string]string) *Storage {
-	return &Storage{st: st}
-}
-
-func (s *Storage) Get(key string) (value string, ok bool) {
-	value, ok = s.st[key]
+func (s *Storage) Get(key string) (value string, ok bool, err error) {
+	val, ok := s.st.Load(key)
+	if ok {
+		value = val.(string)
+	}
 	return
 }
 
-func (s *Storage) Set(key, value string) {
-	s.st[key] = value
+func (s *Storage) Set(key, value string) (err error) {
+	s.st.Store(key, value)
+	return nil
 }
 
-func (s *Storage) Delete(key string) {
-	delete(s.st, key)
+func (s *Storage) Delete(key string) (err error) {
+	s.st.Delete(key)
+	return nil
 }

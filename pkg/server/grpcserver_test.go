@@ -63,8 +63,8 @@ func TestCacheServer_Delete(t *testing.T) {
 }
 
 func initServer() *CacheServer {
-	st := inmemory.NewStorage(make(map[string]string))
-	memCache := NewCacheServer(st)
+	st := inmemory.Storage{}
+	memCache := NewCacheServer(&st)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	memCache.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})

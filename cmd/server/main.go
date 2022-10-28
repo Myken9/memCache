@@ -25,8 +25,8 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	st := inmemory.NewStorage(make(map[string]string))
-	srv := server.NewCacheServer(st)
+	st := inmemory.Storage{}
+	srv := server.NewCacheServer(&st)
 	cache.RegisterCacheServer(s, srv)
 
 	log.Printf("Starting gRPC listener on port " + os.Getenv("PORT"))

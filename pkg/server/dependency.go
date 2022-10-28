@@ -1,7 +1,7 @@
 package server
 
 type Storage interface {
-	Set(key, value string)
-	Get(key string) (value string, ok bool)
-	Delete(key string)
+	Set(key, value string) (err error)
+	Get(key string) (value string, ok bool, err error)
+	Delete(key string) (err error)
 }

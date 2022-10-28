@@ -17,7 +17,7 @@ func NewCacheServer(st Storage) *CacheServer {
 
 func (s *CacheServer) Get(ctx context.Context, in *cache.Key) (*cache.Item, error) {
 
-	value, ok := s.memCache.Get(in.Key)
+	value, ok, _ := s.memCache.Get(in.Key)
 	if ok != true {
 		err := errors.New("the cache has no values for the given key")
 		return nil, err
