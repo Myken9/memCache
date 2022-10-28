@@ -8,31 +8,32 @@ import (
 )
 
 type CacheServer struct {
-	memCache map[string]string
+	memCache Storage
 }
 
-func (g *CacheServer) Get(ctx context.Context, in *cache.Key) (*cache.Item, error) {
+func NewCacheServer(st Storage) *CacheServer {
+	return &CacheServer{memCache: st}
+}
 
-	_, ok := g.memCache[in.Key]
+func (s *CacheServer) Get(ctx context.Context, in *cache.Key) (*cache.Item, error) {
+
+	value, ok := s.memCache.Get(in.Key)
 	if ok != true {
 		err := errors.New("the cache has no values for the given key")
 		return nil, err
 	}
-	a := cache.Item{Key: in.Key, Value: g.memCache[in.Key]}
+	a := cache.Item{Key: in.Key, Value: value}
 	return &a, nil
 }
 
-func (g *CacheServer) Set(ctx context.Context, in *cache.Item) (*empty.Empty, error) {
-	if g.memCache == nil {
-		g.memCache = make(map[string]string)
-	}
-	g.memCache[in.Key] = in.Value
+func (s *CacheServer) Set(ctx context.Context, in *cache.Item) (*empty.Empty, error) {
+	s.memCache.Set(in.Key, in.Value)
 	out := new(empty.Empty)
 	return out, nil
 }
 
-func (g *CacheServer) Delete(ctx context.Context, in *cache.Key) (*empty.Empty, error) {
-	delete(g.memCache, in.Key)
+func (s *CacheServer) Delete(ctx context.Context, in *cache.Key) (*empty.Empty, error) {
+	s.memCache.Delete(in.Key)
 	out := new(empty.Empty)
 	return out, nil
 }

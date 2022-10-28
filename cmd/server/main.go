@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"memcach/pkg/cache"
+	"memcach/pkg/inmemory"
 	"memcach/pkg/server"
 	"net"
 	"os"
@@ -24,8 +25,9 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	srv := server.CacheServer{}
-	cache.RegisterCacheServer(s, &srv)
+	st := inmemory.NewStorage(make(map[string]string))
+	srv := server.NewCacheServer(st)
+	cache.RegisterCacheServer(s, srv)
 
 	log.Printf("Starting gRPC listener on port " + os.Getenv("PORT"))
 	if err := s.Serve(lis); err != nil {

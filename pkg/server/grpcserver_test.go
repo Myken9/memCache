@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/assert"
 	"memcach/pkg/cache"
+	"memcach/pkg/inmemory"
 	"testing"
 	"time"
 )
@@ -62,7 +63,8 @@ func TestCacheServer_Delete(t *testing.T) {
 }
 
 func initServer() *CacheServer {
-	memCache := &CacheServer{memCache: make(map[string]string)}
+	st := inmemory.NewStorage(make(map[string]string))
+	memCache := NewCacheServer(st)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	memCache.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
