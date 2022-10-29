@@ -67,6 +67,9 @@ func initServer() *CacheServer {
 	memCache := NewCacheServer(&st)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	memCache.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
+	_, err := memCache.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
+	if err != nil {
+		return nil
+	}
 	return memCache
 }

@@ -15,7 +15,7 @@ func NewCacheServer(st Storage) *CacheServer {
 	return &CacheServer{memCache: st}
 }
 
-func (s *CacheServer) Get(ctx context.Context, in *cache.Key) (*cache.Item, error) {
+func (s *CacheServer) Get(_ context.Context, in *cache.Key) (*cache.Item, error) {
 
 	value, ok, _ := s.memCache.Get(in.Key)
 	if ok != true {
@@ -26,14 +26,20 @@ func (s *CacheServer) Get(ctx context.Context, in *cache.Key) (*cache.Item, erro
 	return &a, nil
 }
 
-func (s *CacheServer) Set(ctx context.Context, in *cache.Item) (*empty.Empty, error) {
-	s.memCache.Set(in.Key, in.Value)
+func (s *CacheServer) Set(_ context.Context, in *cache.Item) (*empty.Empty, error) {
+	err := s.memCache.Set(in.Key, in.Value)
+	if err != nil {
+		return nil, err
+	}
 	out := new(empty.Empty)
 	return out, nil
 }
 
-func (s *CacheServer) Delete(ctx context.Context, in *cache.Key) (*empty.Empty, error) {
-	s.memCache.Delete(in.Key)
+func (s *CacheServer) Delete(_ context.Context, in *cache.Key) (*empty.Empty, error) {
+	err := s.memCache.Delete(in.Key)
+	if err != nil {
+		return nil, err
+	}
 	out := new(empty.Empty)
 	return out, nil
 }
