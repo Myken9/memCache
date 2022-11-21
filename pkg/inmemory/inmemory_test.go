@@ -1,12 +1,14 @@
 package inmemory
 
 import (
+	"github.com/bradfitz/gomemcache/memcache"
 	"sync"
 	"testing"
 )
 
 func TestStorage_Set(t *testing.T) {
-	st := Storage{}
+	mc := memcache.New("localhost:11211")
+	ns := NewStorage(mc)
 
 	t.Run("Currency set", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -15,7 +17,7 @@ func TestStorage_Set(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Set("555", "444")
+				ns.Set("555", "444")
 			}
 		}()
 
@@ -23,7 +25,7 @@ func TestStorage_Set(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Set("111", "333")
+				ns.Set("111", "333")
 			}
 		}()
 		wg.Wait()
@@ -31,7 +33,8 @@ func TestStorage_Set(t *testing.T) {
 }
 
 func TestStorage_Delete(t *testing.T) {
-	st := Storage{}
+	mc := memcache.New("localhost:11211")
+	ns := NewStorage(mc)
 
 	t.Run("Currency delete", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -40,7 +43,7 @@ func TestStorage_Delete(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Delete("555")
+				ns.Delete("555")
 			}
 		}()
 
@@ -48,7 +51,7 @@ func TestStorage_Delete(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Delete("555")
+				ns.Delete("555")
 			}
 		}()
 		wg.Wait()
@@ -56,7 +59,8 @@ func TestStorage_Delete(t *testing.T) {
 }
 
 func TestStorage_Get(t *testing.T) {
-	st := Storage{}
+	mc := memcache.New("localhost:11211")
+	ns := NewStorage(mc)
 
 	t.Run("Currency get", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -65,7 +69,7 @@ func TestStorage_Get(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Set("555", "333")
+				ns.Set("555", "333")
 			}
 		}()
 
@@ -73,7 +77,7 @@ func TestStorage_Get(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				st.Get("555")
+				ns.Get("555")
 			}
 		}()
 		wg.Wait()

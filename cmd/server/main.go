@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
@@ -24,9 +25,10 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	mc := memcache.New("localhost:11211")
+	ns := inmemory.NewStorage(mc)
+	srv := server.NewCacheServer(ns)
 	s := grpc.NewServer()
-	st := inmemory.Storage{}
-	srv := server.NewCacheServer(&st)
 	cache.RegisterCacheServer(s, srv)
 
 	log.Printf("Starting gRPC listener on port " + os.Getenv("PORT"))

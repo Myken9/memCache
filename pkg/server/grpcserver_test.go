@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/assert"
 	"memcach/pkg/cache"
@@ -35,9 +36,9 @@ func TestCacheServer_Get(t *testing.T) {
 	t.Run("Get unsuccessful", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
-		item, err := s.Get(ctx, &cache.Key{Key: "123"})
+		item, err := s.Get(ctx, &cache.Key{Key: "12322"})
 		assert.Nil(t, item)
-		assert.Equal(t, errors.New("the cache has no values for the given key"), err)
+		assert.Equal(t, errors.New("memcache: cache miss"), err)
 	})
 }
 
@@ -57,19 +58,20 @@ func TestCacheServer_Delete(t *testing.T) {
 		defer cancel()
 		item, err := s.Get(ctx, &cache.Key{Key: "777"})
 		assert.Nil(t, item)
-		assert.Equal(t, errors.New("the cache has no values for the given key"), err)
+		assert.Equal(t, errors.New("memcache: cache miss"), err)
 
 	})
 }
 
 func initServer() *CacheServer {
-	st := inmemory.Storage{}
-	memCache := NewCacheServer(&st)
+	mc := memcache.New("localhost:11211")
+	ns := inmemory.NewStorage(mc)
+	srv := NewCacheServer(ns)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	_, err := memCache.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
+	_, err := srv.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
 	if err != nil {
 		return nil
 	}
-	return memCache
+	return srv
 }

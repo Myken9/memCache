@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"github.com/golang/protobuf/ptypes/empty"
 	"memcach/pkg/cache"
 )
@@ -17,9 +16,8 @@ func NewCacheServer(st Storage) *CacheServer {
 
 func (s *CacheServer) Get(_ context.Context, in *cache.Key) (*cache.Item, error) {
 
-	value, ok, _ := s.memCache.Get(in.Key)
-	if ok != true {
-		err := errors.New("the cache has no values for the given key")
+	value, err := s.memCache.Get(in.Key)
+	if err != nil {
 		return nil, err
 	}
 	a := cache.Item{Key: in.Key, Value: value}

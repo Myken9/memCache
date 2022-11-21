@@ -1,25 +1,37 @@
 package inmemory
 
-import "sync"
+import (
+	"github.com/bradfitz/gomemcache/memcache"
+)
 
 type Storage struct {
-	st sync.Map
+	st *memcache.Client
 }
 
-func (s *Storage) Get(key string) (value string, ok bool, err error) {
-	val, ok := s.st.Load(key)
-	if ok {
-		value = val.(string)
+func NewStorage(client *memcache.Client) *Storage {
+	return &Storage{st: client}
+}
+
+func (s *Storage) Get(key string) (value string, err error) {
+	val, err := s.st.Get(key)
+	if err != nil {
+		return "", err
 	}
-	return
+	return string(val.Value), nil
 }
 
 func (s *Storage) Set(key, value string) (err error) {
-	s.st.Store(key, value)
+	err = s.st.Set(&memcache.Item{Key: key, Value: []byte(value)})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (s *Storage) Delete(key string) (err error) {
-	s.st.Delete(key)
+	err = s.st.Delete(key)
+	if err != nil {
+		return err
+	}
 	return nil
 }
