@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
 	"memcach/pkg/cache"
 	"memcach/pkg/inmemory"
+	"memcach/pkg/memcache"
 	"memcach/pkg/server"
 	"net"
 	"os"
@@ -24,8 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-
-	mc := memcache.New("localhost:11211")
+	mc := memcache.New(os.Getenv("TELNETPORT"))
 	ns := inmemory.NewStorage(mc)
 	srv := server.NewCacheServer(ns)
 	s := grpc.NewServer()

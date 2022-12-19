@@ -1,7 +1,7 @@
 package inmemory
 
 import (
-	"github.com/bradfitz/gomemcache/memcache"
+	"memcach/pkg/memcache"
 )
 
 type Storage struct {
@@ -13,15 +13,15 @@ func NewStorage(client *memcache.Client) *Storage {
 }
 
 func (s *Storage) Get(key string) (value string, err error) {
-	val, err := s.st.Get(key)
+	item, err := s.st.Get(key)
 	if err != nil {
 		return "", err
 	}
-	return string(val.Value), nil
+	return item.Val, nil
 }
 
 func (s *Storage) Set(key, value string) (err error) {
-	err = s.st.Set(&memcache.Item{Key: key, Value: []byte(value)})
+	err = s.st.Set(memcache.Item{Key: key, Val: value})
 	if err != nil {
 		return err
 	}

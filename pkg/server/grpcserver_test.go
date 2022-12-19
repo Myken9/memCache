@@ -3,11 +3,11 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/assert"
 	"memcach/pkg/cache"
 	"memcach/pkg/inmemory"
+	"memcach/pkg/memcache"
 	"testing"
 	"time"
 )
