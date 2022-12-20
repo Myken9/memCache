@@ -1,17 +1,16 @@
 package inmemory
 
 import (
-	"memcach/pkg/memcache"
 	"memcach/pkg/server"
 	"sync"
 )
 
 type Storage struct {
-	st *memcache.Client
+	st Client
 	m  sync.Mutex
 }
 
-func NewStorage(client *memcache.Client) *Storage {
+func NewStorage(client Client) *Storage {
 	return &Storage{st: client}
 }
 
