@@ -1,13 +1,14 @@
 package inmemory
 
 import (
-	"github.com/bradfitz/gomemcache/memcache"
+	"memcach/pkg/memcache"
 	"sync"
 	"testing"
 )
 
 func TestStorage_Set(t *testing.T) {
-	mc := memcache.New("localhost:11211")
+	mc, _ := memcache.New("localhost:11211")
+	defer mc.Close()
 	ns := NewStorage(mc)
 
 	t.Run("Currency set", func(t *testing.T) {
@@ -17,7 +18,10 @@ func TestStorage_Set(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Set("555", "444")
+				err := ns.Set("555", "444")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 
@@ -25,7 +29,10 @@ func TestStorage_Set(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Set("111", "333")
+				err := ns.Set("111", "333")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 		wg.Wait()
@@ -33,7 +40,8 @@ func TestStorage_Set(t *testing.T) {
 }
 
 func TestStorage_Delete(t *testing.T) {
-	mc := memcache.New("localhost:11211")
+	mc, _ := memcache.New("localhost:11211")
+	defer mc.Close()
 	ns := NewStorage(mc)
 
 	t.Run("Currency delete", func(t *testing.T) {
@@ -43,7 +51,10 @@ func TestStorage_Delete(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Delete("555")
+				err := ns.Delete("555")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 
@@ -51,7 +62,10 @@ func TestStorage_Delete(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Delete("555")
+				err := ns.Delete("555")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 		wg.Wait()
@@ -59,8 +73,14 @@ func TestStorage_Delete(t *testing.T) {
 }
 
 func TestStorage_Get(t *testing.T) {
-	mc := memcache.New("localhost:11211")
+	mc, _ := memcache.New("localhost:11211")
+	defer mc.Close()
 	ns := NewStorage(mc)
+
+	err := ns.Set("asd", "asd")
+	if err != nil {
+		panic(err)
+	}
 
 	t.Run("Currency get", func(t *testing.T) {
 		var wg sync.WaitGroup
@@ -69,7 +89,10 @@ func TestStorage_Get(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Set("555", "333")
+				err := ns.Set("555", "333")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 
@@ -77,7 +100,10 @@ func TestStorage_Get(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < 1000; i++ {
-				ns.Get("555")
+				_, err := ns.Get("asd")
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 		wg.Wait()

@@ -20,7 +20,7 @@ func (s *CacheServer) Get(_ context.Context, in *cache.Key) (*cache.Item, error)
 	if err != nil {
 		return nil, err
 	}
-	a := cache.Item{Key: in.Key, Value: value}
+	a := cache.Item{Key: value.Key, Value: value.Val}
 	return &a, nil
 }
 

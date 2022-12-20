@@ -14,7 +14,7 @@ import (
 
 func TestCacheServer_Set(t *testing.T) {
 	s := initServer()
-	t.Run("Add successful", func(t *testing.T) {
+	t.Run("Set successful", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 		item, err := s.Set(ctx, &cache.Item{Key: "123", Value: "some string"})
@@ -38,7 +38,7 @@ func TestCacheServer_Get(t *testing.T) {
 		defer cancel()
 		item, err := s.Get(ctx, &cache.Key{Key: "12322"})
 		assert.Nil(t, item)
-		assert.Equal(t, errors.New("memcache: cache miss"), err)
+		assert.Equal(t, errors.New("memcached: cache miss"), err)
 	})
 }
 
@@ -58,20 +58,24 @@ func TestCacheServer_Delete(t *testing.T) {
 		defer cancel()
 		item, err := s.Get(ctx, &cache.Key{Key: "777"})
 		assert.Nil(t, item)
-		assert.Equal(t, errors.New("memcache: cache miss"), err)
+		assert.Equal(t, errors.New("memcached: cache miss"), err)
 
 	})
 }
 
 func initServer() *CacheServer {
-	mc := memcache.New("localhost:11211")
+	mc, err := memcache.New(":11211")
+	if err != nil {
+		panic(err)
+	}
+	defer mc.Close()
 	ns := inmemory.NewStorage(mc)
 	srv := NewCacheServer(ns)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	_, err := srv.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
+	_, err = srv.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
 	if err != nil {
-		return nil
+		panic(err)
 	}
 	return srv
 }

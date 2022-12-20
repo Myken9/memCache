@@ -2,26 +2,33 @@ package inmemory
 
 import (
 	"memcach/pkg/memcache"
+	"memcach/pkg/server"
+	"sync"
 )
 
 type Storage struct {
 	st *memcache.Client
+	m  sync.Mutex
 }
 
 func NewStorage(client *memcache.Client) *Storage {
 	return &Storage{st: client}
 }
 
-func (s *Storage) Get(key string) (value string, err error) {
+func (s *Storage) Get(key string) (items *server.Item, err error) {
+	s.m.Lock()
 	item, err := s.st.Get(key)
+	s.m.Unlock()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return item.Val, nil
+	return &item, nil
 }
 
 func (s *Storage) Set(key, value string) (err error) {
-	err = s.st.Set(memcache.Item{Key: key, Val: value})
+	s.m.Lock()
+	err = s.st.Set(server.Item{Key: key, Val: value})
+	s.m.Unlock()
 	if err != nil {
 		return err
 	}
@@ -29,7 +36,9 @@ func (s *Storage) Set(key, value string) (err error) {
 }
 
 func (s *Storage) Delete(key string) (err error) {
+	s.m.Lock()
 	err = s.st.Delete(key)
+	s.m.Unlock()
 	if err != nil {
 		return err
 	}

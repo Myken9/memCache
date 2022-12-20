@@ -24,7 +24,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	mc := memcache.New(os.Getenv("TELNETPORT"))
+	mc, err := memcache.New(os.Getenv("TELNET-PORT"))
+	if err != nil {
+		panic(err)
+	}
+	defer mc.Close()
 	ns := inmemory.NewStorage(mc)
 	srv := server.NewCacheServer(ns)
 	s := grpc.NewServer()
