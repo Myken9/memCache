@@ -1,4 +1,4 @@
-package server
+package tests
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"memcach/pkg/cache"
 	"memcach/pkg/inmemory"
 	"memcach/pkg/memcache"
+	"memcach/pkg/server"
 	"testing"
 	"time"
 )
@@ -63,14 +64,13 @@ func TestCacheServer_Delete(t *testing.T) {
 	})
 }
 
-func initServer() *CacheServer {
+func initServer() *server.CacheServer {
 	mc, err := memcache.New(":11211")
 	if err != nil {
 		panic(err)
 	}
-	defer mc.Close()
 	ns := inmemory.NewStorage(mc)
-	srv := NewCacheServer(ns)
+	srv := server.NewCacheServer(ns)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	_, err = srv.Set(ctx, &cache.Item{Key: "777", Value: "777 string"})
