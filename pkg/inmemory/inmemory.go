@@ -7,7 +7,7 @@ import (
 
 type Storage struct {
 	st Client
-	m  sync.Mutex
+	m  sync.RWMutex
 }
 
 func NewStorage(client Client) *Storage {
